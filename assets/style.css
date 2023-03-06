@@ -1,0 +1,11 @@
+.page {}
+
+.navbar {
+    padding: 5px;
+}
+
+.navbar_logo-img {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+}

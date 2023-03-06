@@ -37,8 +37,6 @@ df['macd_signal'] = df['macd'].ewm(span=9).mean()
 df['macd_hist'] = df['macd'] - df['macd_signal']
 
 
-# Continue from previous code block
-
 # Calculate the moving average indicator
 df['ma'] = df['close'].rolling(10).mean()
 
