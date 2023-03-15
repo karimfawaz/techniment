@@ -21,7 +21,7 @@ def get_df():
             "source_device",
         ]
     )
-    
+
 
 class TweetMiner(object):
 
@@ -30,10 +30,10 @@ class TweetMiner(object):
     api = False
 
     twitter_keys = {
-        "consumer_key": "cLwV1vwnMhb4xFxu4lPYXQGoC",
-        "consumer_secret": "YpYWFyVSdPCSkU1n48iELSbU64D1nqGLNhkuFXV58f0ngN6ALQ",
-        # "access_token_key": "<To be replace>",
-        # "access_token_secret": "<To be replace>",
+        "consumer_key": 'Wv0nW3p23AX5EV3Tsh5gmURNx',
+        "consumer_secret": 'Hcy5AH41z6Sclh9AwdHFoJta679VCnMzoOrFawYEkAejkQ40DN',
+        "access_token_key": '1734435330-yATHuq6RVia2N6IDE9Bql4qn0StZJqqT9ul8Vsy',
+        "access_token_secret": 'jUcHGRjz1zVYzfYlC0BcmoL5Ef6dCegIhjSqk5ETlthqF',
     }
 
     def __init__(self, keys_dict=twitter_keys, api=api):
@@ -43,9 +43,9 @@ class TweetMiner(object):
         auth = tweepy.OAuthHandler(
             keys_dict["consumer_key"], keys_dict["consumer_secret"]
         )
-        # auth.set_access_token(
-        #     keys_dict["access_token_key"], keys_dict["access_token_secret"]
-        # )
+        auth.set_access_token(
+            keys_dict["access_token_key"], keys_dict["access_token_secret"]
+        )
 
         self.api = tweepy.API(
             auth, wait_on_rate_limit=True
@@ -109,17 +109,17 @@ class TweetMiner(object):
 
 miner = TweetMiner()
 miner.mine_crypto_currency_tweets()
-handle_list = [
-    "BTC",
-    "ETH",
-    "USDT",
-    "XRP",
-    "BCH",
-    "ADA",
-    "BSV",
-    "LTC",
-    "LINK",
-    "BNB",
-    "EOS",
-    "TRON",
-]
+# handle_list = [
+#     "BTC",
+#     "ETH",
+#     "USDT",
+#     "XRP",
+#     "BCH",
+#     "ADA",
+#     "BSV",
+#     "LTC",
+#     "LINK",
+#     "BNB",
+#     "EOS",
+#     "TRON",
+# ]
