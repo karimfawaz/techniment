@@ -5,17 +5,6 @@ from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassifica
 from datetime import datetime, timedelta
 import pytz
 import time
-# Authentication credentials
-# consumer_key = 'Wv0nW3p23AX5EV3Tsh5gmURNx'
-# consumer_secret = 'Hcy5AH41z6Sclh9AwdHFoJta679VCnMzoOrFawYEkAejkQ40DN'
-# access_token = '1734435330-yATHuq6RVia2N6IDE9Bql4qn0StZJqqT9ul8Vsy'
-# access_token_secret = 'jUcHGRjz1zVYzfYlC0BcmoL5Ef6dCegIhjSqk5ETlthqF'
-
-consumer_key = 'h8Zs6sL0PJORBoeBHRO3fhyrw'
-consumer_secret = 'pFqCAQb59675lKf3zTOXxTgypi9AmzlchFcsAJRyDXqvlkIvjw'
-access_token = '1734435330-pxtDbKNouP3LmRqLa7rk6gkHw48Pna1kXTeeFNj'
-access_token_secret = 'uz4E8IU1I5L5p8nmCsEWWniVO0w2g9SaHWlbM36h4zTM3'
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAHreiAEAAAAASdBq0YNrmpHQxLU9DcWaRePa3fs%3DdWWtoSX8dtX58nALiTCEW4oGTvU1VVhf2OQ5hzzgizlcKmrxZt"
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
@@ -79,7 +68,7 @@ print(sentiment_counts)
 
 
 client = tweepy.Client(
-    "AAAAAAAAAAAAAAAAAAAAAHreiAEAAAAASdBq0YNrmpHQxLU9DcWaRePa3fs%3DdWWtoSX8dtX58nALiTCEW4oGTvU1VVhf2OQ5hzzgizlcKmrxZt", wait_on_rate_limit=True)
+    bearertoken, wait_on_rate_limit=True)
 
 
 def scrape_mentions(FILE_NAME, query_term_liste):
