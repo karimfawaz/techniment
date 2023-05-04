@@ -122,7 +122,7 @@ def get_new_data():
 
     response = requests.get(API_URL, params=params)
     data = response.json()["Data"]
-    print(data)
+
     df = pd.DataFrame(
         data, columns=["time", "open", "high", "low", "close", "volumefrom", "volumeto"]
     )
