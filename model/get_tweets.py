@@ -30,11 +30,13 @@ def get_tweets():
 
 def get_tweet_data(tweets):
     tweet_data = [[tweet.created_at, tweet.full_text] for tweet in tweets]
-    df = pd.DataFrame(tweet_data, columns=["date", "tweet"])
+    df = pd.DataFrame(tweet_data, columns=["date", "text"])
     return df
 
+def save_tweets():
+    tweets = get_tweets()
+    df = get_tweet_data(tweets)
+    print(df)
+    df.to_csv("./data/tweets.csv", index=False)
 
-tweets = get_tweets()
-df = get_tweet_data(tweets)
-print(df)
-df.to_csv("./data/tweets.csv", index=False)
+

@@ -1,5 +1,5 @@
 from PIL import Image
-from model.ta_svm import get_new_data, train_new_model
+from model.multimodal_model import get_new_data, train_new_model
 import streamlit as st
 import plotly.graph_objects as go
 import fear_and_greed
@@ -87,7 +87,7 @@ def create_candlestick_chart(df, start_time, end_time, min_price, max_price):
     fig.add_trace(up_arrows)
     fig.add_trace(down_arrows)
 
-    fig.update_layout(title='Candlestick Chart with Live Bitcoin Price and Model Predictions',
+    fig.update_layout(title={'text': 'Candlestick Chart with Live Bitcoin Price and Model Predictions', 'x': 0.5, 'xanchor': 'center'},
                       xaxis_title='Date',
                       yaxis_title='Price',
                       xaxis_rangeslider_visible=False,
@@ -95,7 +95,7 @@ def create_candlestick_chart(df, start_time, end_time, min_price, max_price):
                       yaxis=dict(range=[min_price, max_price]),
                       dragmode='pan',
                       width=1200,  # Set the width of the chart
-                      height=800  # Set the height of the chart
+                      height=650  # Set the height of the chart
     )
 
     return fig
@@ -103,8 +103,13 @@ def create_candlestick_chart(df, start_time, end_time, min_price, max_price):
 
 df = get_new_data()
 
+def get_random_tweets():
+    tweets_df = pd.read_csv('data/sample_tweets.csv')
+    random_tweets = tweets_df.sample(n=2)
+    return random_tweets
 
-st.set_page_config(layout="wide")
+
+st.set_page_config(page_title="Techniment",layout="wide")
 
 image = Image.open('assets/logo.png')
 
@@ -137,12 +142,12 @@ col1.image(image, width=300)
 # Display the title and description in the second column
 with col2:
 
-    st.title('Combining Technical with Sentiment Analysis')
+    st.title('Combining Technical Data with Sentiment Analysis')
     st.write("""
-    Your app description goes here. This app allows users to visualize and analyze financial data,
-    generate candlestick charts with price predictions, and assess market sentiment using the Fear & Greed Index.
+    Techniment is a web application dashboard which features a candlestick chart with live Bitcoin price and model predictions. The model has been trained on technical data and twitter sentiment analysis. By achieving 99.7% accuracy in classifying the quality of the tweets, we are able to predict the price of Bitcoin with 98% accuracy. Below each candle in the chart, you can see the model's predicted output. You can use this dashboard alongside the Fear & Greed Index to make informed decisions about your investments. 
     """)
 
+random_tweets = get_random_tweets()
 st.divider()
 
 col1, col2 = st.columns([3, 1])  
@@ -150,4 +155,10 @@ col1, col2 = st.columns([3, 1])
 with col1:
     st.plotly_chart(chart)
 with col2:
+    st.markdown("<h2 style='font-size:20px;'>Sample Tweets</h2>", unsafe_allow_html=True)
+
+    for idx, row in random_tweets.iterrows():
+        st.markdown(f"<h3 style='font-size:14px;'>{row['date']}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size:12px;'>{row['tweet']}</p>", unsafe_allow_html=True)
     st.plotly_chart(gauge_chart)
+

@@ -14,6 +14,8 @@ from sklearn.model_selection import GridSearchCV
 import requests
 import re
 
+from model.get_tweets import save_tweets
+
 
 def create_multimodal_model():
     url = "./data/Bitstamp_BTCUSD_1h.csv"
@@ -137,66 +139,12 @@ def create_multimodal_model():
     with open("model/multimodal_scaler.pkl", "wb") as file:
         pickle.dump(scaler, file)
 
-
-def get_new_data():
-    # Get the OHLCV data from the API
-    API_URL = "https://min-api.cryptocompare.com/data/histohour"
-    symbol = "BTC"
-    limit = 2000
-
-    params = {
-        "fsym": symbol,
-        "tsym": "USD",
-        "limit": limit,
-    }
-
-    response = requests.get(API_URL, params=params)
-    data = response.json()["Data"]
-    df = pd.DataFrame(
-        data, columns=["time", "open", "high", "low", "close", "volumefrom", "volumeto"]
-    )
-    df["time"] = pd.to_datetime(df["time"], unit="s")
-
-    # Convert the 'time' column to a Unix timestamp
-    df["timestamp"] = pd.to_datetime(df["time"]).astype(np.int64) // 10**9
-
-    # Map the column names in the new data to match the original data
-    df = df.rename(columns={"volumefrom": "Volume BTC", "volumeto": "Volume USD"})
-
-    # Add the 'unix' column as a copy of the 'timestamp' column
-    df["unix"] = df["timestamp"]
-
-    # Add the technical indicators
-    df["7-day SMA"] = df["close"].rolling(7).mean()
-    df["21-day SMA"] = df["close"].rolling(21).mean()
-    df["EMA_0.67"] = df["close"].ewm(alpha=0.67).mean()
-    df["12-day EMA"] = df["close"].ewm(span=12).mean()
-    df["26-day EMA"] = df["close"].ewm(span=26).mean()
-    df["MACD"] = df["12-day EMA"] - df["26-day EMA"]
-    df["20-day STD"] = df["close"].rolling(window=20).std()
-    df["Upper BB"] = df["21-day SMA"] + (2 * df["20-day STD"])
-    df["Lower BB"] = df["21-day SMA"] - (2 * df["20-day STD"])
-    df["High-Low Spread"] = df["high"] - df["low"]
-    df["MA Indicator"] = np.where(df["7-day SMA"] > df["21-day SMA"], 1, 0)
-
-    # Calculate the price difference between consecutive periods
-    df["Price Diff"] = df["close"].diff()
-
-    # Create a binary variable that indicates whether the price has gone up (1) or down (0)
-    df["Price Direction"] = np.where(df["Price Diff"] > 0, 1, 0)
-
-    # Drop rows with NaN values
-    df = df.dropna()
-
-    return df
-
-
 def train_new_model(df):
     # Load the pickled model and scaler
-    with open("model/best_svm.pkl", "rb") as f:
+    with open("model/multimodal_model.pkl", "rb") as f:
         loaded_model = pickle.load(f)
 
-    with open("model/scaler.pkl", "rb") as f:
+    with open("model/multimodal_scaler.pkl", "rb") as f:
         loaded_scaler = pickle.load(f)
 
     # Scale the new data
@@ -223,6 +171,7 @@ def train_new_model(df):
         "Lower BB",
         "High-Low Spread",
         "MA Indicator",
+        "sentiment",
         "Price Diff",
     ]
     new_X = new_X[column_order]
@@ -236,7 +185,7 @@ def train_new_model(df):
     return predictions
 
 
-create_multimodal_model()
+# create_multimodal_model()
 
 
 def is_valid_date(date_string):
@@ -340,9 +289,9 @@ def get_filtered_tweets():
 # print("Done!")
 
 
-def get_hourly_sentiment():
+def get_hourly_sentiment(tweets="./data/2022_tweets.csv"):
     # Load the preprocessed 2022 tweets
-    tweets = pd.read_csv("./data/2022_tweets.csv")
+    tweets = pd.read_csv(tweets)
 
     # Filter out rows with invalid date strings
     tweets = tweets[tweets["date"].apply(is_valid_date)]
@@ -403,3 +352,66 @@ def get_hourly_sentiment():
 
 # print(hourly_sentiment_df)
 # hourly_sentiment_df.to_csv("./data/hourly_sentiment.csv", index=False)
+
+def get_new_data():
+    # Get the OHLCV data from the API
+    API_URL = "https://min-api.cryptocompare.com/data/histohour"
+    symbol = "BTC"
+    limit = 2000
+
+    params = {
+        "fsym": symbol,
+        "tsym": "USD",
+        "limit": limit,
+    }
+
+    response = requests.get(API_URL, params=params)
+    data = response.json()["Data"]
+    df = pd.DataFrame(
+        data, columns=["time", "open", "high", "low", "close", "volumefrom", "volumeto"]
+    )
+    df["time"] = pd.to_datetime(df["time"], unit="s")
+
+    # Convert the 'time' column to a Unix timestamp
+    df["timestamp"] = pd.to_datetime(df["time"]).astype(np.int64) // 10**9
+
+    # Map the column names in the new data to match the original data
+    df = df.rename(columns={"volumefrom": "Volume BTC", "volumeto": "Volume USD"})
+
+    # Add the 'unix' column as a copy of the 'timestamp' column
+    df["unix"] = df["timestamp"]
+
+    # Add the technical indicators
+    df["7-day SMA"] = df["close"].rolling(7).mean()
+    df["21-day SMA"] = df["close"].rolling(21).mean()
+    df["EMA_0.67"] = df["close"].ewm(alpha=0.67).mean()
+    df["12-day EMA"] = df["close"].ewm(span=12).mean()
+    df["26-day EMA"] = df["close"].ewm(span=26).mean()
+    df["MACD"] = df["12-day EMA"] - df["26-day EMA"]
+    df["20-day STD"] = df["close"].rolling(window=20).std()
+    df["Upper BB"] = df["21-day SMA"] + (2 * df["20-day STD"])
+    df["Lower BB"] = df["21-day SMA"] - (2 * df["20-day STD"])
+    df["High-Low Spread"] = df["high"] - df["low"]
+    df["MA Indicator"] = np.where(df["7-day SMA"] > df["21-day SMA"], 1, 0)
+
+    # Calculate the price difference between consecutive periods
+    df["Price Diff"] = df["close"].diff()
+
+    # Create a binary variable that indicates whether the price has gone up (1) or down (0)
+    df["Price Direction"] = np.where(df["Price Diff"] > 0, 1, 0)
+
+    # Drop rows with NaN values
+    df = df.dropna()
+    # save_tweets()
+    tweets_sentiment = get_hourly_sentiment("./data/tweets.csv")
+    tweets_sentiment['date_hour'] = pd.to_datetime(tweets_sentiment['date_hour']).astype(np.int64) // 10**9
+
+    df = df.merge(
+        tweets_sentiment, left_on="timestamp", right_on="date_hour", how="left"
+    )
+    df["sentiment"].fillna(0, inplace=True)
+    df = df.drop(columns=["date_hour"])
+
+    return df
+
+# get_new_data()
