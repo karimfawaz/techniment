@@ -44,7 +44,7 @@ def create_candlestick_chart(df, start_time, end_time, min_price, max_price):
     df['prediction'] = df['prediction'].map({1: 'up', 0: 'down'})
     df['prediction'] = df['prediction'].shift(0)
 
-    # Replace the dummy prediction logic with the actual predictions from the SVM model
+
     # Create scatter plot trace for up arrows
     up_arrows = go.Scatter(
         x=df[df['prediction'] == 'up']['time'],
@@ -144,7 +144,7 @@ with col2:
 
     st.title('Combining Technical Data with Sentiment Analysis')
     st.write("""
-    Techniment is a web application dashboard which features a candlestick chart with live Bitcoin price and model predictions. The model has been trained on technical data and twitter sentiment analysis. By achieving 99.7% accuracy in classifying the quality of the tweets, we are able to predict the price of Bitcoin with 98% accuracy. Below each candle in the chart, you can see the model's predicted output. You can use this dashboard alongside the Fear & Greed Index to make informed decisions about your investments. 
+    Techniment is a web application dashboard which features a candlestick chart with live Bitcoin price and model predictions. The model has been trained on technical data and twitter sentiment analysis. By achieving 99.7% accuracy in classifying tweets and technical data, we are able to predict the price of Bitcoin with 98% accuracy. Below each candle in the chart, you can see the model's predicted output. You can use this dashboard alongside the Fear & Greed Index to make informed decisions about your investments. 
     """)
 
 random_tweets = get_random_tweets()

@@ -1,5 +1,0 @@
-https://huggingface.co/finiteautomata/bertweet-base-sentiment-analysis
-
-https://simpletransformers.ai/docs/installation/
-
-https://huggingface.co/course/chapter1/1

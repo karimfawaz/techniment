@@ -130,6 +130,51 @@ def create_multimodal_model():
     test_accuracy = accuracy_score(y_test, y_test_pred)
     print(f"Test Accuracy: {test_accuracy:.4f}")
     print(classification_report(y_test, y_test_pred))
+    def calculate_profit(y_test, y_test_pred, close_prices):
+        initial_capital = 0
+        btc_holdings = 0
+        short_positions = 0
+
+        for i in range(len(y_test_pred) - 1):
+            if y_test_pred[i] == 1:
+                if short_positions > 0:
+                    # Close short position
+                    initial_capital -= close_prices[i]
+                    short_positions -= 1
+                else:
+                    # Open long position
+                    btc_holdings += 1
+                    initial_capital -= close_prices[i]
+            elif y_test_pred[i] == 0:
+                if btc_holdings > 0:
+                    # Close long position
+                    btc_holdings -= 1
+                    initial_capital += close_prices[i]
+                else:
+                    # Open short position
+                    short_positions += 1
+                    initial_capital += close_prices[i]
+
+        # Close remaining positions at the end
+        initial_capital += btc_holdings * close_prices[-1] - short_positions * close_prices[-1]
+
+        return initial_capital
+
+    # Calculate the profit made using the model's predictions
+    model_profit = calculate_profit(y_test, y_test_pred, X_test["close"].values)
+    print(f"Profit made using the model's predictions: ${model_profit:.2f}")
+
+    # Calculate the profit made using the buy and hold approach
+    buy_and_hold_profit = X_test["close"].values[-1] - X_test["close"].values[0]
+    print(f"Profit made using the buy and hold approach: ${buy_and_hold_profit:.2f}")
+
+    # Compare the model's profit to the buy and hold profit
+    if model_profit > buy_and_hold_profit:
+        print("The model's trading strategy outperformed the buy and hold approach.")
+    elif model_profit < buy_and_hold_profit:
+        print("The buy and hold approach outperformed the model's trading strategy.")
+    else:
+        print("The model's trading strategy and the buy and hold approach performed equally.")
 
     print("Saving the model")
 
